@@ -12,9 +12,7 @@ from individual import Individual
 from feature_dimension import FeatureDimension
 from plot_utils import plot_heatmap, plot_fives
 import utils
-from properties import NGEN, IMG_SIZE, \
-    EXPECTED_LABEL, INITIALPOP, \
-    ORIGINAL_SEEDS, MUTPB, BITMAP_THRESHOLD, RUNTIME, INTERVAL
+from properties import ORIGINAL_SEEDS, BITMAP_THRESHOLD, RUNTIME, INTERVAL
 
 
 class MapElites(ABC):

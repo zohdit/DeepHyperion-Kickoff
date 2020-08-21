@@ -66,7 +66,7 @@ for i in range(len(imgs)):
     bitmap_count = utils.bitmap_count(x.member, 0.6)
     angle_calc = utils.angle_calc(x.member)
     move_dist = utils.move_distance(x.member)
-    orientation_calc = utils.new_orientation_calc(x.member, 0)
+    orientation_calc = utils.orientation_calc(x.member, 0)
 
     bitmaps.append(bitmap_count)
     angles.append(angle_calc)

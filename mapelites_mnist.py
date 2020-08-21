@@ -15,9 +15,9 @@ import vectorization_tools
 from digit_input import Digit
 
 from individual import Individual
-from properties import NGEN, IMG_SIZE, \
+from properties import NGEN, \
     POPSIZE, EXPECTED_LABEL, INITIALPOP, \
-    ORIGINAL_SEEDS, MUTPB, BITMAP_THRESHOLD
+    ORIGINAL_SEEDS, BITMAP_THRESHOLD
 
 # Load the dataset.
 mnist = keras.datasets.mnist
@@ -51,11 +51,6 @@ class MapElitesMNIST(MapElites):
         b = tuple()
         for ft in self.feature_dimensions:
             i = ft.feature_descriptor(self, x)  
-            # new_max = 24
-            # new_min = 0 
-            # old_min = 0
-            # old_max = ft.bins
-            # new_i = ((new_max - new_min) / (old_max - old_min)) * (i - old_min) + new_min 
             b = b + (i,)
         return b
 
@@ -106,7 +101,7 @@ class MapElitesMNIST(MapElites):
     def generate_feature_dimensions(self, type): 
         fts = list()
         if type == 1:
-            # feature 6: moves in svg path
+            # feature 1: moves in svg path
             ft7 = FeatureDimension(name="Moves", feature_simulator="move_distance",bins=10)
             fts.append(ft7)
 
@@ -115,24 +110,22 @@ class MapElitesMNIST(MapElites):
             fts.append(ft2)
 
         elif type == 2:
-            # feature 7: orientation
+            # feature 1: orientation
             ft8 = FeatureDimension(name="Orientation", feature_simulator="orientation_calc",bins=100)
             fts.append(ft8)
 
-            # feature 6: moves in svg path
+            # feature 2: moves in svg path
             ft7 = FeatureDimension(name="Moves", feature_simulator="move_distance",bins=10)
             fts.append(ft7)
         
         else:
-            # feature 7: orientation
+            # feature 1: orientation
             ft8 = FeatureDimension(name="Orientation", feature_simulator="orientation_calc",bins=100)
             fts.append(ft8)
 
             # feature 2: Number of bitmaps above threshold
             ft2 = FeatureDimension(name="Bitmaps", feature_simulator="bitmap_count", bins=180)
-            fts.append(ft2)
-               
-               
+            fts.append(ft2)     
 
         return fts
        
@@ -143,20 +136,12 @@ class MapElitesMNIST(MapElites):
         :param x: genotype of candidate solution x
         :return: 
         """
-        if function == 'controlpoint_count':
-            return utils.controlpoint_count(x.member)
         if function == 'bitmap_count':
             return utils.bitmap_count(x.member, BITMAP_THRESHOLD)
-        if function == 'angle_calc':
-            return utils.angle_calc(x.member)
         if function == 'move_distance':
             return utils.move_distance(x.member)
-        if function == 'min_radius_calc':
-            return utils.min_radius_calc(x.member)
-        if function == 'DSA_calc':
-            return utils.DSA_calc(x.member, EXPECTED_LABEL, x.seed)
         if function == 'orientation_calc':
-            return utils.new_orientation_calc(x.member,0)
+            return utils.orientation_calc(x.member,0)
             
 
 def main():
