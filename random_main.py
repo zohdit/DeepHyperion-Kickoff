@@ -172,7 +172,8 @@ def generate_maps(execution_time, iterations):
             filled = np.count_nonzero(map_E.solutions!=None)
             total = np.size(map_E.solutions)
             filled_density = (filled / total)
-                
+            
+            Individual.COUNT_MISS = 0
             covered_seeds = set()
             for (i,j), value in np.ndenumerate(map_E.performances): 
                 if map_E.performances[i,j] != 2.0:
