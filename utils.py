@@ -50,7 +50,7 @@ def reshape(v):
     v = v / 255.0
     return v
 
-def print_image(filename, image, cmap):
+def print_image(filename, image, cmap=''):
     if cmap != '':
         plt.imsave(filename, image.reshape(28, 28), cmap=cmap)
     else:

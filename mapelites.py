@@ -24,7 +24,7 @@ class MapElites(ABC):
         :param minimization: True if solving a minimization problem. False if solving a maximization problem.
         """
         self.elapsed_time = 0
-
+        self.log_dir_path = ""
         self.minimization = minimization    
         # set the choice operator either to do a minimization or a maximization
         if self.minimization:

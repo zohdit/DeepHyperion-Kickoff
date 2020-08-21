@@ -3,8 +3,8 @@ from os import makedirs
 from os.path import exists
 import numpy as np
 
-from properties import RESULTS_PATH, ARC_LEN
-
+from properties import RESULTS_PATH, ARCHIVE_THRESHOLD
+from utils import get_distance
 
 class Archive:
 
@@ -18,13 +18,28 @@ class Archive:
 
     def update_archive(self, ind):
         if ind not in self.archive:
-            if self.threshold is None or ind.ff < self.threshold:
+            if len(self.archive) == 0:
                 self.archive.append(ind)
+                self.archived_seeds.add(ind.seed)
+            else:
+                # Find the member of the archive that is closest to the candidate.
+                closest_archived = None
+                d_min = np.inf
+                i = 0
+                while i < len(self.archive):
+                    distance_archived = get_distance(ind.member.purified, self.archive[i].member.purified)
+                    if distance_archived < d_min:
+                        closest_archived = self.archive[i]
+                        d_min = distance_archived
+                    i += 1
+                # Decide whether to add the candidate to the archive
+                # Verify whether the candidate is close to the existing member of the archive
+                # Note: 'close' is defined according to a user-defined threshold
+                if d_min > ARCHIVE_THRESHOLD:
+                    # Add the candidate to the archive if it is distant from all the other archive members
+                    self.archive.append(ind)
+                    self.archived_seeds.add(ind.seed)
 
-    def update_threshold(self):
-        self.archive.sort(key=lambda x: x.ff)
-        self.archive = self.archive[:ARC_LEN]
-        self.threshold = self.archive[-1].ff
 
     def get_seeds(self):
         seeds = set()
@@ -81,5 +96,4 @@ class Archive:
         file = open(dst, 'w')
         file.write(report_string)
         file.close()
-
 
