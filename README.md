@@ -32,7 +32,7 @@ Installing Other Dependencies
 
 This tool has other dependencies such as tensorflow and deap.
 
-To easily install the dependencies with pip, we suggest to go in the folder where you extracted DeepJanus-MNIST and run the command:
+To easily install the dependencies with pip:
 
 ``` 
 $ pip install -r requirements.txt
