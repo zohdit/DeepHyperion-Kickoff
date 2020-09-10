@@ -5,7 +5,7 @@ import mutation_manager
 import rasterization_tools
 import vectorization_tools
 from digit_input import Digit
-from properties import MUTOPPROB, EXPECTED_LABEL, MUTOFPROB
+from properties import MUTOPPROB, EXPECTED_LABEL, MUTOFPROB, DISTANCE
 from utils import get_distance
 
 
@@ -39,11 +39,11 @@ class DigitMutator:
             
             distance_inputs = get_distance(reference.purified, rasterized_digit)
             
-            if distance_inputs != 0 and distance_inputs <= 2.0:
+            if distance_inputs != 0 and distance_inputs <= DISTANCE:
                 condition = False    
     
         self.digit.xml_desc = mutant_xml_desc
         self.digit.purified = rasterized_digit   
         self.digit.is_original = False     
-        #return distance_inputs
+        
 

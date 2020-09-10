@@ -12,7 +12,7 @@ from individual import Individual
 from feature_dimension import FeatureDimension
 from plot_utils import plot_heatmap, plot_fives
 import utils
-from properties import ORIGINAL_SEEDS, BITMAP_THRESHOLD, RUNTIME, INTERVAL
+from properties import ORIGINAL_SEEDS, RUNTIME, INTERVAL
 
 
 class MapElites(ABC):
@@ -119,9 +119,12 @@ class MapElites(ABC):
         filled =np.count_nonzero(performances!=2.0)   
         
         original_seeds = set()
+        mis_seeds = set()
         for (i,j), value in np.ndenumerate(solutions):
             if solutions[i,j] != None:
                 original_seeds.add(solutions[i,j].seed)
+                if performances[i,j] < 0:
+                    mis_seeds.add(solutions[i,j].seed)
                 
         Individual.COUNT_MISS = 0
         for (i,j), value in np.ndenumerate(performances): 
@@ -132,15 +135,14 @@ class MapElites(ABC):
                 utils.print_image(f"{log_dir_path}/({i},{j})", solutions[i,j].member.purified, 'gray')
 
         report = {
-            'features': self.feature_dimensions[1].name + ',' + self.feature_dimensions[0].name,
-            'covered_seeds' : len(original_seeds),
-            'filled cells': str(filled),
-            'filled density': str(filled/total),
-            'misclassification': str(Individual.COUNT_MISS),
-            'misclassification density': str(Individual.COUNT_MISS/filled),
-            'iterations': str(iterations)
+            'Covered seeds' : len(original_seeds),
+            'Filled cells': str(filled),
+            'Filled density': str(filled/total),
+            'Misclassified seeds':len(mis_seeds) ,
+            'Misclassification': str(Individual.COUNT_MISS),
+            'Misclassification density': str(Individual.COUNT_MISS/filled)
         }  
-        dst = f"logs/{log_dir_name}" + f'/report_'+ self.feature_dimensions[1].name +'_'+ self.feature_dimensions[0].name+'.json'
+        dst = f"logs/report_" + self.feature_dimensions[1].name +"_"+ self.feature_dimensions[0].name + "_" + str(execution_time) +'.json'
         report_string = json.dumps(report)
 
         file = open(dst, 'w')

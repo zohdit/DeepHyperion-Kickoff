@@ -148,9 +148,14 @@ def main():
     for i in range(1,4):
         map_E = MapElitesMNIST(i, NGEN, POPSIZE, True)
         map_E.run()        
+        
         run_time = map_E.get_elapsed_time()
         print(f"Running time: {run_time}")
         Individual.COUNT = 0
+        
+    rand = random.randint(0,10000)
+    filename = f"logs/results_{rand}"
+    utils.generate_reports(filename)
         
 
 

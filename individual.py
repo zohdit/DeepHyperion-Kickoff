@@ -3,7 +3,7 @@ import keras
 
 import evaluator
 import predictor
-from properties import EXPECTED_LABEL, num_classes,FITNESS
+from properties import EXPECTED_LABEL, num_classes
 from utils import get_distance
 from digit_mutator import DigitMutator
 

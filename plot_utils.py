@@ -6,6 +6,8 @@ from svgpathtools import svg2paths, wsvg
 import os
 import re
 import numpy as np
+import glob
+
 
 def plot_heatmap(data, 
                 xlabel,
@@ -38,7 +40,7 @@ def getImage(path):
     return OffsetImage(plt.imread(path))
 
 def plot_fives(dir_path, xlabel, ylabel):    
-    paths = os.listdir(dir_path + "/"+xlabel+"_"+ylabel)
+    paths = glob.glob(dir_path + "/"+xlabel+"_"+ylabel+"/*.png")
     x=[]
     y=[]
     for a in paths:
@@ -54,7 +56,8 @@ def plot_fives(dir_path, xlabel, ylabel):
     #ax.scatter(x, y) 
 
     for x0, y0, path in zip(x, y,paths):
-        ab = AnnotationBbox(getImage(dir_path+"/"+xlabel+"_"+ylabel+"/"+path), (y0, x0), frameon=False)
+        
+        ab = AnnotationBbox(getImage(path), (y0, x0), frameon=False)
         ax.add_artist(ab)
 
     plt.xlabel(xlabel)

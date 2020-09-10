@@ -1,3 +1,4 @@
+import os
 from os import makedirs
 from os.path import exists, basename
 from shutil import copyfile
@@ -5,22 +6,24 @@ import matplotlib
 from PIL import Image
 import math
 from skimage.measure import label, regionprops, regionprops_table
-from predictor import Predictor
-
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from sklearn.linear_model import LinearRegression
-
+import csv
+import json
+import glob
 import keras
-from properties import IMG_SIZE
 import xml.etree.ElementTree as ET
 import potrace
 import numpy as np
 import re
 
+# local imports
+
 import vectorization_tools
 import rasterization_tools
+from properties import IMG_SIZE, INTERVAL
 
 NAMESPACE = '{http://www.w3.org/2000/svg}'
 
@@ -55,6 +58,7 @@ def print_image(filename, image, cmap=''):
         plt.imsave(filename, image.reshape(28, 28), cmap=cmap)
     else:
         plt.imsave(filename, image.reshape(28, 28))
+        np.save(filename, image)
 
 def bitmap_count(digit, threshold):    
     bw = np.asarray(digit.purified).copy()    
@@ -125,3 +129,35 @@ def rescale(solutions, perfs, new_min = 0, new_max = 24):
                 output2[new_i,new_j] = value
                 output1[new_i,new_j] = solutions[i,j]
     return output1, output2
+
+def generate_reports(filename): 
+    filename = filename + ".csv"
+    fw = open(filename, 'w')
+    cf = csv.writer(fw, lineterminator='\n')
+
+    # write the header
+    cf.writerow(["Features","Time","Covered seeds","Filled cells","Filled density", "Misclassified seeds","Misclassification","Misclassification density"])
+        
+    jsons = [f for f in glob.glob("logs/*.json") if "Bitmaps_Moves" in f]
+    id = INTERVAL/60
+    for json_data in jsons:
+        with open(json_data) as json_file:
+            data = json.load(json_file)             
+            cf.writerow(["Bitmaps,Moves",id,data["Covered seeds"],data["Filled cells"],data["Filled density"],data["Misclassified seeds"],data["Misclassification"],data["Misclassification density"]])
+            id += (INTERVAL/60)
+
+    jsons = [g for g in glob.glob("logs/*.json") if "Moves_Orientation" in g]
+    id = INTERVAL/60
+    for json_data in jsons:
+        with open(json_data) as json_file:
+            data = json.load(json_file)             
+            cf.writerow(["Orientation,Moves",id,data["Covered seeds"],data["Filled cells"],data["Filled density"],data["Misclassified seeds"],data["Misclassification"],data["Misclassification density"]])
+            id += (INTERVAL/60)
+
+    jsons = [h for h in glob.glob("logs/*.json") if "Bitmaps_Orientation" in h]
+    id = INTERVAL/60
+    for json_data in jsons:
+        with open(json_data) as json_file:
+            data = json.load(json_file)             
+            cf.writerow(["Bitmaps,Orientation",id,data["Covered seeds"],data["Filled cells"],data["Filled density"],data["Misclassified seeds"],data["Misclassification"],data["Misclassification density"]])
+            id += (INTERVAL/60)
