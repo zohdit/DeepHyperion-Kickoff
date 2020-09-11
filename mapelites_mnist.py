@@ -1,15 +1,10 @@
-import time
-import argparse
 import random
-from datetime import datetime
-import numpy as np
 from tensorflow import keras
 
 # local imports
 
 from mapelites import MapElites
 from feature_dimension import FeatureDimension
-import plot_utils
 import utils
 import vectorization_tools
 from digit_input import Digit
@@ -23,7 +18,6 @@ from properties import NGEN, \
 mnist = keras.datasets.mnist
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-
 # Fetch the starting seeds from file
 with open(ORIGINAL_SEEDS) as f:
     starting_seeds = f.read().split(',')[:-1]
@@ -31,11 +25,11 @@ with open(ORIGINAL_SEEDS) as f:
     starting_seeds = starting_seeds[:POPSIZE]
     assert (len(starting_seeds) == POPSIZE)
 
+
 def generate_digit(seed):
     seed_image = x_test[int(seed)]
     xml_desc = vectorization_tools.vectorize(seed_image)
     return Digit(xml_desc, EXPECTED_LABEL)
-
 
 
 class MapElitesMNIST(MapElites):
@@ -50,7 +44,7 @@ class MapElitesMNIST(MapElites):
         """
         b = tuple()
         for ft in self.feature_dimensions:
-            i = ft.feature_descriptor(self, x)  
+            i = ft.feature_descriptor(self, x)
             b = b + (i,)
         return b
 
@@ -59,17 +53,17 @@ class MapElitesMNIST(MapElites):
         Apply the fitness function to x
         """
         # "calculate performance measure"    
-        pref = x.evaluate()     
+        pref = x.evaluate()
         return pref
 
     def mutation(self, x, seed):
         """
         Mutate the solution x
         """
-        #"apply mutation"        
-        Individual.COUNT += 1        
+        # "apply mutation"
+        Individual.COUNT += 1
         reference = generate_digit(seed)
-        x.mutate(reference)             
+        x.mutate(reference)
         return x
 
     def generate_random_solution(self):
@@ -78,7 +72,7 @@ class MapElitesMNIST(MapElites):
         the first solutions in the feature space, so that we start
         filling the bins
         """
-        #"Generate random solution"
+        # "Generate random solution"
         Individual.COUNT += 1
         if INITIALPOP == 'random':
             # Choose randomly a file in the original dataset.
@@ -95,40 +89,39 @@ class MapElitesMNIST(MapElites):
         digit1.is_original = True
         individual = Individual(digit1, seed)
         individual.seed = seed
-        
+
         return individual
 
-    def generate_feature_dimensions(self, type): 
+    def generate_feature_dimensions(self, _type):
         fts = list()
-        if type == 1:
+        if _type == 1:
             # feature 1: moves in svg path
-            ft7 = FeatureDimension(name="Moves", feature_simulator="move_distance",bins=10)
+            ft7 = FeatureDimension(name="Moves", feature_simulator="move_distance", bins=10)
             fts.append(ft7)
 
             # feature 2: Number of bitmaps above threshold
             ft2 = FeatureDimension(name="Bitmaps", feature_simulator="bitmap_count", bins=180)
             fts.append(ft2)
 
-        elif type == 2:
+        elif _type == 2:
             # feature 1: orientation
-            ft8 = FeatureDimension(name="Orientation", feature_simulator="orientation_calc",bins=100)
+            ft8 = FeatureDimension(name="Orientation", feature_simulator="orientation_calc", bins=100)
             fts.append(ft8)
 
             # feature 2: moves in svg path
-            ft7 = FeatureDimension(name="Moves", feature_simulator="move_distance",bins=10)
+            ft7 = FeatureDimension(name="Moves", feature_simulator="move_distance", bins=10)
             fts.append(ft7)
-        
+
         else:
             # feature 1: orientation
-            ft8 = FeatureDimension(name="Orientation", feature_simulator="orientation_calc",bins=100)
+            ft8 = FeatureDimension(name="Orientation", feature_simulator="orientation_calc", bins=100)
             fts.append(ft8)
 
             # feature 2: Number of bitmaps above threshold
             ft2 = FeatureDimension(name="Bitmaps", feature_simulator="bitmap_count", bins=180)
-            fts.append(ft2)     
+            fts.append(ft2)
 
         return fts
-       
 
     def feature_simulator(self, function, x):
         """
@@ -141,22 +134,23 @@ class MapElitesMNIST(MapElites):
         if function == 'move_distance':
             return utils.move_distance(x.member)
         if function == 'orientation_calc':
-            return utils.orientation_calc(x.member,0)
-            
+            return utils.orientation_calc(x.member, 0)
+
 
 def main():
-    for i in range(1,4):
-        map_E = MapElitesMNIST(i, NGEN, POPSIZE, True)
-        map_E.run()        
-        
+    rand1 = random.randint(0, 1000000000)
+    log_dir_name = f"temp_{rand1}"
+    for i in range(1, 4):
+        map_E = MapElitesMNIST(i, NGEN, POPSIZE, log_dir_name, True)
+        map_E.run()
+
         run_time = map_E.get_elapsed_time()
         print(f"Running time: {run_time}")
         Individual.COUNT = 0
-        
-    rand = random.randint(0,10000)
-    filename = f"logs/results_{rand}"
+
+    rand2 = random.randint(0, 10000)
+    filename = f"logs/{log_dir_name}/results_{rand2}"
     utils.generate_reports(filename)
-        
 
 
 if __name__ == "__main__":

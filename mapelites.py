@@ -1,31 +1,28 @@
-import time
 import operator
 import numpy as np
 from datetime import datetime
-from itertools import permutations
 from abc import ABC, abstractmethod
 from pathlib import Path
 import json
 
 # local imports
 from individual import Individual
-from feature_dimension import FeatureDimension
 from plot_utils import plot_heatmap, plot_fives
 import utils
-from properties import ORIGINAL_SEEDS, RUNTIME, INTERVAL
+from properties import RUNTIME, INTERVAL
 
 
 class MapElites(ABC):
 
-    def __init__(self, type, iterations, bootstrap_individuals, minimization):
+    def __init__(self, _type, iterations, bootstrap_individuals, log_dir_path, minimization):
         """
         :param iterations: Number of evolutionary iterations        
         :param bootstrap_individuals: Number of individuals randomly generated to bootstrap the algorithm       
         :param minimization: True if solving a minimization problem. False if solving a maximization problem.
         """
         self.elapsed_time = 0
-        self.log_dir_path = ""
-        self.minimization = minimization    
+        self.log_dir_path = log_dir_path
+        self.minimization = minimization
         # set the choice operator either to do a minimization or a maximization
         if self.minimization:
             self.place_operator = operator.lt
@@ -33,24 +30,21 @@ class MapElites(ABC):
             self.place_operator = operator.ge
 
         self.iterations = iterations
-        
+
         self.random_solutions = bootstrap_individuals
-        self.feature_dimensions = self.generate_feature_dimensions(type)
+        self.feature_dimensions = self.generate_feature_dimensions(_type)
 
         # get number of bins for each feature dimension
         ft_bins = [ft.bins for ft in self.feature_dimensions]
-     
 
         # Map of Elites: Initialize data structures to store solutions and fitness values
-        self.solutions =  np.full(
+        self.solutions = np.full(
             ft_bins, None,
-            dtype=(object)
+            dtype=object
         )
         self.performances = np.full(ft_bins, 2.0, dtype=float)
 
         print("Configuration completed.")
-
-
 
     def generate_initial_population(self):
         """
@@ -82,15 +76,15 @@ class MapElites(ABC):
                 ind = self.mutation(ind, ind.seed)
                 # place the new individual in the map of elites
                 self.place_in_mapelites(ind)
-            
+
             elapsed_time = datetime.now() - start_time
-            if (elapsed_time.seconds) >= INTERVAL*ii:           
-                self.extract_results(i, (INTERVAL*ii/60))
+            if elapsed_time.seconds >= INTERVAL * ii:
+                self.extract_results(i, (INTERVAL * ii / 60))
                 ii += 1
 
         end_time = datetime.now()
         self.elapsed_time = end_time - start_time
-    
+
         if self.minimization:
             best = self.performances.argmin()
         else:
@@ -99,50 +93,51 @@ class MapElites(ABC):
         best_perf = self.performances[idx]
         best_ind = self.solutions[idx]
         print(f"Best overall value: {best_perf}"
-                        f" produced by individual {best_ind}"
-                        f" and placed at {self.map_x_to_b(best_ind)}")
+              f" produced by individual {best_ind}"
+              f" and placed at {self.map_x_to_b(best_ind)}")
 
     def extract_results(self, iterations, execution_time):
         now = datetime.now().strftime("%Y%m%d%H%M%S")
-        log_dir_name = f"log_{self.random_solutions}_{iterations}_{execution_time}_{now}" 
-        log_dir_path = Path(f'logs/{log_dir_name}/{self.feature_dimensions[1].name}_{self.feature_dimensions[0].name}')
-        log_dir_path.mkdir(parents=True, exist_ok=True)  
-        self.log_dir_path = f"logs/{log_dir_name}"
+        log_dir_name = f"{self.log_dir_path}/log_{self.random_solutions}_{iterations}_{execution_time}_{now}"
+        log_dir_path = Path(f"logs/{log_dir_name}/{self.feature_dimensions[1].name}_{self.feature_dimensions[0].name}")
+        log_dir_path.mkdir(parents=True, exist_ok=True)
+
         # rescale
-        solutions, performances = utils.rescale(self.solutions,self.performances)
-        
+        solutions, performances = utils.rescale(self.solutions, self.performances)
+
         # filled values                                 
-        indices = np.count_nonzero(solutions!=None)
+        indices = np.count_nonzero(solutions is not None)
         total = np.size(solutions)
-        coverage_percentage = (indices / total)*100            
-    
-        filled =np.count_nonzero(performances!=2.0)   
-        
+        coverage_percentage = (indices / total) * 100
+
+        filled = np.count_nonzero(performances != 2.0)
+
         original_seeds = set()
         mis_seeds = set()
-        for (i,j), value in np.ndenumerate(solutions):
-            if solutions[i,j] != None:
-                original_seeds.add(solutions[i,j].seed)
-                if performances[i,j] < 0:
-                    mis_seeds.add(solutions[i,j].seed)
-                
+        for (i, j), value in np.ndenumerate(solutions):
+            if solutions[i, j] is not None:
+                original_seeds.add(solutions[i, j].seed)
+                if performances[i, j] < 0:
+                    mis_seeds.add(solutions[i, j].seed)
+
         Individual.COUNT_MISS = 0
-        for (i,j), value in np.ndenumerate(performances): 
-            if performances[i,j] < 0:   
-                Individual.COUNT_MISS += 1             
-                utils.print_image(f"{log_dir_path}/({i},{j})", solutions[i,j].member.purified, '')
-            elif 0 < performances[i,j] < 2:
-                utils.print_image(f"{log_dir_path}/({i},{j})", solutions[i,j].member.purified, 'gray')
+        for (i, j), value in np.ndenumerate(performances):
+            if performances[i, j] < 0:
+                Individual.COUNT_MISS += 1
+                utils.print_image(f"{log_dir_path}/({i},{j})", solutions[i, j].member.purified, '')
+            elif 0 < performances[i, j] < 2:
+                utils.print_image(f"{log_dir_path}/({i},{j})", solutions[i, j].member.purified, 'gray')
 
         report = {
-            'Covered seeds' : len(original_seeds),
+            'Covered seeds': len(original_seeds),
             'Filled cells': str(filled),
-            'Filled density': str(filled/total),
-            'Misclassified seeds':len(mis_seeds) ,
+            'Filled density': str(filled / total),
+            'Misclassified seeds': len(mis_seeds),
             'Misclassification': str(Individual.COUNT_MISS),
-            'Misclassification density': str(Individual.COUNT_MISS/filled)
-        }  
-        dst = f"logs/report_" + self.feature_dimensions[1].name +"_"+ self.feature_dimensions[0].name + "_" + str(execution_time) +'.json'
+            'Misclassification density': str(Individual.COUNT_MISS / filled)
+        }
+        dst = f"logs/{log_dir_name}/report_" + self.feature_dimensions[1].name + "_" + self.feature_dimensions[
+            0].name + "_" + str(execution_time) + '.json'
         report_string = json.dumps(report)
 
         file = open(dst, 'w')
@@ -151,7 +146,6 @@ class MapElites(ABC):
 
         self.plot_map_of_elites(performances)
         plot_fives(f"logs/{log_dir_name}", self.feature_dimensions[1].name, self.feature_dimensions[0].name)
-        
 
     def place_in_mapelites(self, x):
         """
@@ -169,17 +163,16 @@ class MapElites(ABC):
         b = self.map_x_to_b(x)
         # performance of the x
         perf = self.performance_measure(x)
-       
+
         reconstruct = False
         for i in range(len(b)):
             if b[i] >= self.feature_dimensions[i].bins:
                 reconstruct = True
                 self.feature_dimensions[i].bins = b[i] + 1
-      
-        
+
         if reconstruct:
-            self.recounstruct_map()
-        
+            self.reconstruct_map()
+
         # place operator performs either minimization or maximization
         if self.place_operator(perf, self.performances[b]):
             print(f"PLACE: Placing individual {x} at {b} with perf: {perf}")
@@ -214,9 +207,8 @@ class MapElites(ABC):
             :return: Boolean
             """
             if self.solutions[index] == None:
-                return True            
+                return True
             return False
-
 
         # individuals
         inds = list()
@@ -233,14 +225,14 @@ class MapElites(ABC):
     def get_elapsed_time(self):
         return self.elapsed_time
 
-    def recounstruct_map(self):
+    def reconstruct_map(self):
         """
         Extend Map of elites dynamically if needed
         """
         # get number of bins for each feature dimension
         ft_bins = [ft.bins for ft in self.feature_dimensions]
 
-        new_solutions =  np.full(
+        new_solutions = np.full(
             ft_bins, None,
             dtype=(object)
         )
@@ -257,11 +249,10 @@ class MapElites(ABC):
         Plot a heatmap of elites
         """
         plot_heatmap(perfs,
-                      self.feature_dimensions[1].name,
-                      self.feature_dimensions[0].name,
-                     savefig_path=self.log_dir_path                     
+                     self.feature_dimensions[1].name,
+                     self.feature_dimensions[0].name,
+                     savefig_path=self.log_dir_path
                      )
-
 
     @abstractmethod
     def performance_measure(self, x):
@@ -299,7 +290,7 @@ class MapElites(ABC):
         pass
 
     @abstractmethod
-    def generate_feature_dimensions(self):
+    def generate_feature_dimensions(self, _type):
         """
         Generate a list of FeatureDimension objects to define the feature dimension functions
         :return: List of FeatureDimension objects
