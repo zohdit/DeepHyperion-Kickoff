@@ -3,7 +3,7 @@ import argparse
 import random
 from datetime import datetime
 import numpy as np
-import keras
+from tensorflow import keras
 
 # local imports
 
