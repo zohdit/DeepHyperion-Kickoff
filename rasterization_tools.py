@@ -2,7 +2,7 @@ import cairo
 import numpy as np
 from gi import require_version
 import gi
-import keras
+from tensorflow import keras
 #from utils import reshape
 from properties import IMG_SIZE
 
