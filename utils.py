@@ -1,3 +1,8 @@
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 import os
 from os import makedirs
 from os.path import exists, basename
@@ -6,8 +11,6 @@ import matplotlib
 from PIL import Image
 import math
 from skimage.measure import label, regionprops, regionprops_table
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from sklearn.linear_model import LinearRegression
 import csv
