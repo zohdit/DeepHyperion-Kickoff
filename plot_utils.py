@@ -1,6 +1,6 @@
-
-import seaborn as sns
 import matplotlib.pyplot as plt
+import seaborn as sns
+
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from svgpathtools import svg2paths, wsvg
 import os
