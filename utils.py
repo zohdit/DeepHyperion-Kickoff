@@ -13,7 +13,7 @@ from sklearn.linear_model import LinearRegression
 import csv
 import json
 import glob
-import keras
+from tensorflow import keras
 import xml.etree.ElementTree as ET
 import potrace
 import numpy as np
