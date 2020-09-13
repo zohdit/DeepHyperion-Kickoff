@@ -135,7 +135,7 @@ def rescale(solutions, perfs, new_min = 0, new_max = 24):
                 output1[new_i,new_j] = solutions[i,j]
     return output1, output2
 
-def generate_reports(filename): 
+def generate_reports(filename, log_dir_path): 
     filename = filename + ".csv"
     fw = open(filename, 'w')
     cf = csv.writer(fw, lineterminator='\n')
@@ -143,7 +143,7 @@ def generate_reports(filename):
     # write the header
     cf.writerow(["Features","Time","Covered seeds","Filled cells","Filled density", "Misclassified seeds","Misclassification","Misclassification density"])
         
-    jsons = [f for f in glob.glob("logs/*.json") if "Bitmaps_Moves" in f]
+    jsons = [f for f in glob.glob(f"{log_dir_path}/*.json") if "Bitmaps_Moves" in f]
     id = INTERVAL/60
     for json_data in jsons:
         with open(json_data) as json_file:
@@ -151,7 +151,7 @@ def generate_reports(filename):
             cf.writerow(["Bitmaps,Moves",id,data["Covered seeds"],data["Filled cells"],data["Filled density"],data["Misclassified seeds"],data["Misclassification"],data["Misclassification density"]])
             id += (INTERVAL/60)
 
-    jsons = [g for g in glob.glob("logs/*.json") if "Moves_Orientation" in g]
+    jsons = [g for g in glob.glob(f"{log_dir_path}/*.json") if "Moves_Orientation" in g]
     id = INTERVAL/60
     for json_data in jsons:
         with open(json_data) as json_file:
@@ -159,7 +159,7 @@ def generate_reports(filename):
             cf.writerow(["Orientation,Moves",id,data["Covered seeds"],data["Filled cells"],data["Filled density"],data["Misclassified seeds"],data["Misclassification"],data["Misclassification density"]])
             id += (INTERVAL/60)
 
-    jsons = [h for h in glob.glob("logs/*.json") if "Bitmaps_Orientation" in h]
+    jsons = [h for h in glob.glob(f"{log_dir_path}/*.json") if "Bitmaps_Orientation" in h]
     id = INTERVAL/60
     for json_data in jsons:
         with open(json_data) as json_file:

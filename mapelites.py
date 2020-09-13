@@ -142,8 +142,8 @@ class MapElites(ABC):
             'Misclassification density': str(Individual.COUNT_MISS / filled)
         }
 
-        # Note: log_dir_name is already logs/temp...
-        dst = f"{log_dir_name}/report_" + self.feature_dimensions[1].name + "_" + self.feature_dimensions[
+        
+        dst = f"{self.log_dir_path}/report_" + self.feature_dimensions[1].name + "_" + self.feature_dimensions[
             0].name + "_" + str(execution_time) + '.json'
         report_string = json.dumps(report)
 
@@ -151,8 +151,7 @@ class MapElites(ABC):
         file.write(report_string)
         file.close()
 
-        self.plot_map_of_elites(performances)
-        # Note: log_dir_name is already logs/temp...
+        self.plot_map_of_elites(performances, log_dir_name)        
         plot_fives(f"{log_dir_name}", self.feature_dimensions[1].name, self.feature_dimensions[0].name)
 
     def place_in_mapelites(self, x):
@@ -252,14 +251,14 @@ class MapElites(ABC):
         self.performances = new_performances
         return
 
-    def plot_map_of_elites(self, perfs):
+    def plot_map_of_elites(self, perfs, log_dir_name):
         """
         Plot a heatmap of elites
         """
         plot_heatmap(perfs,
                      self.feature_dimensions[1].name,
                      self.feature_dimensions[0].name,
-                     savefig_path=self.log_dir_path
+                     savefig_path=log_dir_name
                      )
 
     @abstractmethod
