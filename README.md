@@ -60,3 +60,36 @@ When the run is finished, the tool produces the following outputs in the logs fo
 Run the command: python mapelites_mnist.py
 
 
+# Docker
+
+To build the docker image to be posted on DockerHub for running DeepHyperion we can run the following command from the project root (where the Dockerfile is located(:
+
+```
+docker build -t deephyperion:3.6 --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" .
+```
+
+Once this is build, the experiment can be executed using the following command:
+
+```
+docker run -v <YOUR_LOCAL_FOLDER>:/deephyperion/logs -it deephyperion:3.6
+```
+
+where `-v <YOUR_LOCAL_FOLDER>:/deephyperion/logs` will make sure that the output of DeepHyperion will be written to `<YOUR_LOCAL_FOLDER>`
+
+To customize the experiment (not yet fully tested) you can specify properties on the command line. For example, to change the overall duration of the run you can add the following option to the docker run command:
+
+```
+--env DH_RUNTIME=30
+```
+
+> Time is in seconds
+
+To change the log interval instead you can add the following option to the docker run command:
+
+```
+--env DH_INTERVAL=10
+```
+
+> Time is in seconds
+
+
