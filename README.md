@@ -1,6 +1,8 @@
-# DeepHyperion #
+# DeepHyperion
 
-Input test generator using illumination search algorithm
+Input test generator using illumination search algorithm.
+
+> The following instructions apply for **Python 3.7**.
 
 ## Dependencies ##
 
