@@ -98,9 +98,14 @@ class MapElites(ABC):
 
     def extract_results(self, iterations, execution_time):
         now = datetime.now().strftime("%Y%m%d%H%M%S")
+        # self.log_dir_path is "logs/temp_..."
         log_dir_name = f"{self.log_dir_path}/log_{self.random_solutions}_{iterations}_{execution_time}_{now}"
-        log_dir_path = Path(f"logs/{log_dir_name}/{self.feature_dimensions[1].name}_{self.feature_dimensions[0].name}")
+
+        # Create another folder insider the log one ...
+        log_dir_path = Path(f"{log_dir_name}/{self.feature_dimensions[1].name}_{self.feature_dimensions[0].name}")
         log_dir_path.mkdir(parents=True, exist_ok=True)
+
+
 
         # rescale
         solutions, performances = utils.rescale(self.solutions, self.performances)
@@ -136,7 +141,9 @@ class MapElites(ABC):
             'Misclassification': str(Individual.COUNT_MISS),
             'Misclassification density': str(Individual.COUNT_MISS / filled)
         }
-        dst = f"logs/{log_dir_name}/report_" + self.feature_dimensions[1].name + "_" + self.feature_dimensions[
+
+        # Note: log_dir_name is already logs/temp...
+        dst = f"{log_dir_name}/report_" + self.feature_dimensions[1].name + "_" + self.feature_dimensions[
             0].name + "_" + str(execution_time) + '.json'
         report_string = json.dumps(report)
 
@@ -145,7 +152,8 @@ class MapElites(ABC):
         file.close()
 
         self.plot_map_of_elites(performances)
-        plot_fives(f"logs/{log_dir_name}", self.feature_dimensions[1].name, self.feature_dimensions[0].name)
+        # Note: log_dir_name is already logs/temp...
+        plot_fives(f"{log_dir_name}", self.feature_dimensions[1].name, self.feature_dimensions[0].name)
 
     def place_in_mapelites(self, x):
         """

@@ -2,7 +2,10 @@ import cairo
 import numpy as np
 from gi import require_version
 import gi
-from tensorflow import keras
+
+# For Python 3.6 we use the base keras
+import keras
+
 #from utils import reshape
 from properties import IMG_SIZE
 

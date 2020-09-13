@@ -1,5 +1,7 @@
 import random
-from tensorflow import keras
+
+# For Python 3.6 we use the base keras
+import keras
 
 # local imports
 
@@ -13,6 +15,10 @@ from individual import Individual
 from properties import NGEN, \
     POPSIZE, EXPECTED_LABEL, INITIALPOP, \
     ORIGINAL_SEEDS, BITMAP_THRESHOLD
+
+from pathlib import Path
+
+
 
 # Load the dataset.
 mnist = keras.datasets.mnist
@@ -138,8 +144,15 @@ class MapElitesMNIST(MapElites):
 
 
 def main():
+    # Generate random folder to store result
     rand1 = random.randint(0, 1000000000)
     log_dir_name = f"temp_{rand1}"
+    log_dir_name = f"logs/{log_dir_name}"
+    # Ensure the folder exists
+    Path(log_dir_name).mkdir(parents=True, exist_ok=True)
+
+    print("Logging results to " + log_dir_name)
+
     for i in range(1, 4):
         map_E = MapElitesMNIST(i, NGEN, POPSIZE, log_dir_name, True)
         map_E.run()
@@ -148,8 +161,11 @@ def main():
         print(f"Running time: {run_time}")
         Individual.COUNT = 0
 
+    #
     rand2 = random.randint(0, 10000)
-    filename = f"logs/{log_dir_name}/results_{rand2}"
+    filename = f"{log_dir_name}/results_{rand2}"
+
+
     utils.generate_reports(filename)
 
 

@@ -16,7 +16,9 @@ from sklearn.linear_model import LinearRegression
 import csv
 import json
 import glob
-from tensorflow import keras
+# For Python 3.6 we use the base keras
+import keras
+
 import xml.etree.ElementTree as ET
 import potrace
 import numpy as np

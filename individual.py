@@ -1,5 +1,7 @@
 import numpy as np
-from tensorflow import keras
+
+# For Python 3.6 we use the base keras
+import keras
 
 import evaluator
 import predictor
