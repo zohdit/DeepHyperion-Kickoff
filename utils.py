@@ -119,7 +119,7 @@ def orientation_calc(digit, threshold):
 def rescale(solutions, perfs, new_min = 0, new_max = 24):
     max_shape = new_max + 1
     output1 = np.full((max_shape,max_shape), None,dtype=(object))
-    output2 = np.full((max_shape,max_shape), 2.0, dtype=(float))
+    output2 = np.full((max_shape,max_shape), np.inf, dtype=(float))
     
         
     old_min_i = 0
@@ -129,7 +129,7 @@ def rescale(solutions, perfs, new_min = 0, new_max = 24):
     for (i,j), value in np.ndenumerate(perfs):
         new_i = int(((new_max - new_min) / (old_max_i - old_min_i)) * (i - old_min_i) + new_min)
         new_j = int(((new_max - new_min) / (old_max_j - old_min_j)) * (j - old_min_j) + new_min)
-        if value != 2.0:
+        if value != np.inf:
             if output2[new_i, new_j] == 2.0 or value < output2[new_i,new_j]:
                 output2[new_i,new_j] = value
                 output1[new_i,new_j] = solutions[i,j]
