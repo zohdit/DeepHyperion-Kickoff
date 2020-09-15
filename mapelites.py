@@ -105,17 +105,12 @@ class MapElites(ABC):
         log_dir_path = Path(f"{log_dir_name}/{self.feature_dimensions[1].name}_{self.feature_dimensions[0].name}")
         log_dir_path.mkdir(parents=True, exist_ok=True)
 
-
-
         # rescale
         solutions, performances = utils.rescale(self.solutions, self.performances)
 
         # filled values                                 
-        indices = np.count_nonzero(solutions is not None)
-        total = np.size(solutions)
-        coverage_percentage = (indices / total) * 100
-
-        filled = np.count_nonzero(performances != np.inf)
+        filled = np.count_nonzero(solutions != None)
+        total = np.size(solutions)        
 
         original_seeds = set()
         mis_seeds = set()
@@ -130,7 +125,7 @@ class MapElites(ABC):
             if performances[i, j] < 0:
                 Individual.COUNT_MISS += 1
                 utils.print_image(f"{log_dir_path}/({i},{j})", solutions[i, j].member.purified, '')
-            elif 0 < performances[i, j] < 2:
+            elif 0 < performances[i, j] < np.inf:
                 utils.print_image(f"{log_dir_path}/({i},{j})", solutions[i, j].member.purified, 'gray')
 
         report = {
@@ -141,7 +136,6 @@ class MapElites(ABC):
             'Misclassification': str(Individual.COUNT_MISS),
             'Misclassification density': str(Individual.COUNT_MISS / filled)
         }
-
         
         dst = f"{self.log_dir_path}/report_" + self.feature_dimensions[1].name + "_" + self.feature_dimensions[
             0].name + "_" + str(execution_time) + '.json'
@@ -150,7 +144,7 @@ class MapElites(ABC):
         file = open(dst, 'w')
         file.write(report_string)
         file.close()
-
+        
         self.plot_map_of_elites(performances, log_dir_name)        
         plot_fives(f"{log_dir_name}", self.feature_dimensions[1].name, self.feature_dimensions[0].name)
 

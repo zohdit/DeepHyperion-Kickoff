@@ -130,7 +130,7 @@ def rescale(solutions, perfs, new_min = 0, new_max = 24):
         new_i = int(((new_max - new_min) / (old_max_i - old_min_i)) * (i - old_min_i) + new_min)
         new_j = int(((new_max - new_min) / (old_max_j - old_min_j)) * (j - old_min_j) + new_min)
         if value != np.inf:
-            if output2[new_i, new_j] == 2.0 or value < output2[new_i,new_j]:
+            if output2[new_i, new_j] == np.inf or value < output2[new_i,new_j]:
                 output2[new_i,new_j] = value
                 output1[new_i,new_j] = solutions[i,j]
     return output1, output2
@@ -143,7 +143,7 @@ def generate_reports(filename, log_dir_path):
     # write the header
     cf.writerow(["Features","Time","Covered seeds","Filled cells","Filled density", "Misclassified seeds","Misclassification","Misclassification density"])
         
-    jsons = [f for f in glob.glob(f"{log_dir_path}/*.json") if "Bitmaps_Moves" in f]
+    jsons = [f for f in sorted(glob.glob(f"{log_dir_path}/*.json"),  key=os.path.getmtime) if "Bitmaps_Moves" in f]
     id = INTERVAL/60
     for json_data in jsons:
         with open(json_data) as json_file:
@@ -151,7 +151,7 @@ def generate_reports(filename, log_dir_path):
             cf.writerow(["Bitmaps,Moves",id,data["Covered seeds"],data["Filled cells"],data["Filled density"],data["Misclassified seeds"],data["Misclassification"],data["Misclassification density"]])
             id += (INTERVAL/60)
 
-    jsons = [g for g in glob.glob(f"{log_dir_path}/*.json") if "Moves_Orientation" in g]
+    jsons = [g for g in sorted(glob.glob(f"{log_dir_path}/*.json"),  key=os.path.getmtime) if "Moves_Orientation" in g]
     id = INTERVAL/60
     for json_data in jsons:
         with open(json_data) as json_file:
@@ -159,7 +159,7 @@ def generate_reports(filename, log_dir_path):
             cf.writerow(["Orientation,Moves",id,data["Covered seeds"],data["Filled cells"],data["Filled density"],data["Misclassified seeds"],data["Misclassification"],data["Misclassification density"]])
             id += (INTERVAL/60)
 
-    jsons = [h for h in glob.glob(f"{log_dir_path}/*.json") if "Bitmaps_Orientation" in h]
+    jsons = [h for h in sorted(glob.glob(f"{log_dir_path}/*.json"), key=os.path.getmtime) if "Bitmaps_Orientation" in h]
     id = INTERVAL/60
     for json_data in jsons:
         with open(json_data) as json_file:
