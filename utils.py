@@ -23,7 +23,7 @@ import xml.etree.ElementTree as ET
 import potrace
 import numpy as np
 import re
-
+import copy
 # local imports
 
 import vectorization_tools
@@ -65,8 +65,9 @@ def print_image(filename, image, cmap=''):
         plt.imsave(filename, image.reshape(28, 28))
         np.save(filename, image)
 
-def bitmap_count(digit, threshold):    
-    bw = np.asarray(digit.purified).copy()    
+def bitmap_count(digit, threshold): 
+    image = copy.deepcopy(digit.purified)   
+    bw = np.asarray(image) 
     #bw = bw / 255.0    
     count = 0    
     for x in np.nditer(bw):
@@ -103,7 +104,8 @@ def move_distance(digit):
 def orientation_calc(digit, threshold):
     x = []
     y = []
-    bw = np.asarray(digit.purified).copy()  
+    image = copy.deepcopy(digit.purified)   
+    bw = np.asarray(image)   
     for iz,ix,iy,ig in np.ndindex(bw.shape):
         if bw[iz,ix,iy,ig] > threshold:
             x.append([iy])          
@@ -114,7 +116,7 @@ def orientation_calc(digit, threshold):
     normalized_ori = (-lr.coef_ + 2)/4
     # scale to be between 0 and 100
     new_ori = normalized_ori * 100
-    return int(new_ori)       
+    return int(new_ori)      
 
 def rescale(solutions, perfs, new_min = 0, new_max = 24):
     max_shape = new_max + 1
