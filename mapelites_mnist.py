@@ -3,7 +3,8 @@ from datetime import datetime
 
 # For Python 3.6 we use the base keras
 import keras
-
+import time
+import json
 # local imports
 
 from mapelites import MapElites
@@ -159,12 +160,19 @@ def main():
         map_E.run()
 
         run_time = map_E.get_elapsed_time()
-        print(f"Running time: {run_time}")
-        Individual.COUNT = 0
+        repo = {
+            "Run time": str(run_time),
+            f"{map_E.feature_dimensions[1].name}_min": map_E.feature_dimensions[1].min,
+            f"{map_E.feature_dimensions[1].name}_max": map_E.feature_dimensions[1].bins,
+            f"{map_E.feature_dimensions[0].name}_min": map_E.feature_dimensions[0].min,
+            f"{map_E.feature_dimensions[0].name}_max": map_E.feature_dimensions[0].bins,
+            "Performances": map_E.performances.tolist()
+        }
+        filename = f"{log_dir_name}/results_{map_E.feature_dimensions[1].name}_{map_E.feature_dimensions[0].name}.json"
+        with open(filename, 'w') as f:
+            f.write(json.dumps(repo))
 
-        
-    filename = f"{log_dir_name}/results_{now}"
-    utils.generate_reports(filename, log_dir_name)
+        Individual.COUNT = 0
 
 
 if __name__ == "__main__":

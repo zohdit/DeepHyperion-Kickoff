@@ -77,10 +77,7 @@ class MapElites(ABC):
                 # place the new individual in the map of elites
                 self.place_in_mapelites(ind)
 
-            elapsed_time = datetime.now() - start_time
-            if elapsed_time.seconds >= INTERVAL * ii:
-                self.extract_results(i, (INTERVAL * ii / 60))
-                ii += 1
+        self.extract_results(i, (INTERVAL * ii / 60))
 
         end_time = datetime.now()
         self.elapsed_time = end_time - start_time
@@ -89,6 +86,7 @@ class MapElites(ABC):
             best = self.performances.argmin()
         else:
             best = self.performances.argmax()
+
         idx = np.unravel_index(best, self.performances.shape)
         best_perf = self.performances[idx]
         best_ind = self.solutions[idx]
@@ -105,36 +103,33 @@ class MapElites(ABC):
         log_dir_path = Path(f"{log_dir_name}/{self.feature_dimensions[1].name}_{self.feature_dimensions[0].name}")
         log_dir_path.mkdir(parents=True, exist_ok=True)
 
-        # rescale
-        solutions, performances = utils.rescale(self.solutions, self.performances)
-
         # filled values                                 
-        filled = np.count_nonzero(solutions != None)
-        total = np.size(solutions)        
+        filled = np.count_nonzero(self.solutions != None)
+        total = np.size(self.solutions)        
 
         original_seeds = set()
         mis_seeds = set()
-        for (i, j), value in np.ndenumerate(solutions):
-            if solutions[i, j] is not None:
-                original_seeds.add(solutions[i, j].seed)
-                if performances[i, j] < 0:
-                    mis_seeds.add(solutions[i, j].seed)
+        for (i, j), value in np.ndenumerate(self.solutions):
+            if self.solutions[i, j] is not None:
+                original_seeds.add(self.solutions[i, j].seed)
+                if self.performances[i, j] < 0:
+                    mis_seeds.add(self.solutions[i, j].seed)
 
         Individual.COUNT_MISS = 0
-        for (i, j), value in np.ndenumerate(performances):
-            if performances[i, j] < 0:
+        for (i, j), value in np.ndenumerate(self.performances):
+            if self.performances[i, j] < 0:
                 Individual.COUNT_MISS += 1
-                utils.print_image(f"{log_dir_path}/({i},{j})", solutions[i, j].member.purified, '')
-            elif 0 < performances[i, j] < np.inf:
-                utils.print_image(f"{log_dir_path}/({i},{j})", solutions[i, j].member.purified, 'gray')
+                utils.print_image(f"{log_dir_path}/({i},{j})", self.solutions[i, j].member.purified, '')
+            elif 0 < self.performances[i, j] < np.inf:
+                utils.print_image(f"{log_dir_path}/({i},{j})", self.solutions[i, j].member.purified, 'gray')
 
         report = {
             'Covered seeds': len(original_seeds),
-            'Filled cells': str(filled),
-            'Filled density': str(filled / total),
+            'Filled cells': (filled),
+            'Filled density': (filled / total),
             'Misclassified seeds': len(mis_seeds),
-            'Misclassification': str(Individual.COUNT_MISS),
-            'Misclassification density': str(Individual.COUNT_MISS / filled)
+            'Misclassification': (Individual.COUNT_MISS),
+            'Misclassification density': (Individual.COUNT_MISS / filled)
         }
         
         dst = f"{self.log_dir_path}/report_" + self.feature_dimensions[1].name + "_" + self.feature_dimensions[
@@ -145,8 +140,8 @@ class MapElites(ABC):
         file.write(report_string)
         file.close()
         
-        self.plot_map_of_elites(performances, log_dir_name)        
-        plot_fives(f"{log_dir_name}", self.feature_dimensions[1].name, self.feature_dimensions[0].name)
+        self.plot_map_of_elites(self.performances, log_dir_name)        
+        
 
     def place_in_mapelites(self, x):
         """
