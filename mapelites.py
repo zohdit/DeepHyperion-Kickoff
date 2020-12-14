@@ -151,11 +151,11 @@ class MapElites(ABC):
         run_time = execution_time
         repo = {
             "Run time": str(run_time),
-            f"{map_E.feature_dimensions[1].name}_min": map_E.feature_dimensions[1].min,
-            f"{map_E.feature_dimensions[1].name}_max": map_E.feature_dimensions[1].bins,
-            f"{map_E.feature_dimensions[0].name}_min": map_E.feature_dimensions[0].min,
-            f"{map_E.feature_dimensions[0].name}_max": map_E.feature_dimensions[0].bins,
-            "Performances": map_E.performances.tolist()
+            f"{self.feature_dimensions[1].name}_min": self.feature_dimensions[1].min,
+            f"{self.feature_dimensions[1].name}_max": self.feature_dimensions[1].bins,
+            f"{self.feature_dimensions[0].name}_min": self.feature_dimensions[0].min,
+            f"{self.feature_dimensions[0].name}_max": self.feature_dimensions[0].bins,
+            "Performances": self.performances.tolist()
         }
         filename = f"{log_dir_name}/results_{map_E.feature_dimensions[1].name}_{map_E.feature_dimensions[0].name}_{execution_time}.json"
         with open(filename, 'w') as f:
