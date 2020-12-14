@@ -12,6 +12,7 @@ class FeatureDimension:
         self.name = name
         self.feature_simulator = feature_simulator
         self.bins = bins
+        self.min = np.inf
 
     def feature_descriptor(self, mapelite, x):
         """
