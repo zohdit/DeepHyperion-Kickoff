@@ -137,7 +137,7 @@ class MapElites(ABC):
             'Performances': self.performances.tolist()
         }
         
-        dst = f"{self.log_dir_path}/report_" + self.feature_dimensions[1].name + "_" + self.feature_dimensions[
+        dst = f"{log_dir_name}/report_" + self.feature_dimensions[1].name + "_" + self.feature_dimensions[
             0].name + "_" + str(execution_time) + '.json'
         report_string = json.dumps(report)
 
