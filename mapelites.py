@@ -141,7 +141,8 @@ class MapElites(ABC):
         file.write(report_string)
         file.close()
         
-        self.plot_map_of_elites(self.performances, log_dir_name)        
+        self.plot_map_of_elites(self.performances, log_dir_name)    
+        plot_fives(f"{log_dir_name}", self.feature_dimensions[1].name, self.feature_dimensions[0].name)    
         
 
     def place_in_mapelites(self, x):
