@@ -148,7 +148,7 @@ class MapElites(ABC):
         self.plot_map_of_elites(self.performances, log_dir_name)    
         plot_fives(f"{log_dir_name}", self.feature_dimensions[1].name, self.feature_dimensions[0].name)    
 
-        run_time = map_E.get_elapsed_time()
+        run_time = execution_time
         repo = {
             "Run time": str(run_time),
             f"{map_E.feature_dimensions[1].name}_min": map_E.feature_dimensions[1].min,
