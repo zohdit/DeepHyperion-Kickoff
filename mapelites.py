@@ -157,7 +157,7 @@ class MapElites(ABC):
             f"{self.feature_dimensions[0].name}_max": self.feature_dimensions[0].bins,
             "Performances": self.performances.tolist()
         }
-        filename = f"{log_dir_name}/results_{map_E.feature_dimensions[1].name}_{map_E.feature_dimensions[0].name}_{execution_time}.json"
+        filename = f"{log_dir_name}/results_{self.feature_dimensions[1].name}_{self.feature_dimensions[0].name}_{execution_time}.json"
         with open(filename, 'w') as f:
             f.write(json.dumps(repo))
         
