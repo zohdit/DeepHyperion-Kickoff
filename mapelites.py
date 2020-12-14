@@ -147,6 +147,19 @@ class MapElites(ABC):
         
         self.plot_map_of_elites(self.performances, log_dir_name)    
         plot_fives(f"{log_dir_name}", self.feature_dimensions[1].name, self.feature_dimensions[0].name)    
+
+        run_time = map_E.get_elapsed_time()
+        repo = {
+            "Run time": str(run_time),
+            f"{map_E.feature_dimensions[1].name}_min": map_E.feature_dimensions[1].min,
+            f"{map_E.feature_dimensions[1].name}_max": map_E.feature_dimensions[1].bins,
+            f"{map_E.feature_dimensions[0].name}_min": map_E.feature_dimensions[0].min,
+            f"{map_E.feature_dimensions[0].name}_max": map_E.feature_dimensions[0].bins,
+            "Performances": map_E.performances.tolist()
+        }
+        filename = f"{log_dir_name}/results_{map_E.feature_dimensions[1].name}_{map_E.feature_dimensions[0].name}_{execution_time}.json"
+        with open(filename, 'w') as f:
+            f.write(json.dumps(repo))
         
 
     def place_in_mapelites(self, x):
