@@ -129,7 +129,8 @@ class MapElites(ABC):
             'Filled density': (filled / total),
             'Misclassified seeds': len(mis_seeds),
             'Misclassification': (Individual.COUNT_MISS),
-            'Misclassification density': (Individual.COUNT_MISS / filled)
+            'Misclassification density': (Individual.COUNT_MISS / filled),
+            'Performances': self.performances.tolist()
         }
         
         dst = f"{self.log_dir_path}/report_" + self.feature_dimensions[1].name + "_" + self.feature_dimensions[
