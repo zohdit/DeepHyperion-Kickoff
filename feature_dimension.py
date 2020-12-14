@@ -1,4 +1,6 @@
 
+import numpy as np
+
 class FeatureDimension:
     """
     Implements a feature dimension of the MAP-Elites algorithm
