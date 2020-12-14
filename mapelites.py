@@ -76,6 +76,10 @@ class MapElites(ABC):
                 ind = self.mutation(ind, ind.seed)
                 # place the new individual in the map of elites
                 self.place_in_mapelites(ind)
+                elapsed_time = datetime.now() - start_time
+                if elapsed_time.seconds >= self.config.INTERVAL * ii:
+                    self.extract_results(i, (self.config.INTERVAL * ii / 60))
+                    ii += 1
 
         self.extract_results(i, (INTERVAL * ii / 60))
 
