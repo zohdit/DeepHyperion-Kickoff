@@ -161,18 +161,6 @@ def main():
         map_E = MapElitesMNIST(i, NGEN, POPSIZE, log_dir_name, True)
         map_E.run()
 
-        run_time = map_E.get_elapsed_time()
-        repo = {
-            "Run time": str(run_time),
-            f"{map_E.feature_dimensions[1].name}_min": map_E.feature_dimensions[1].min,
-            f"{map_E.feature_dimensions[1].name}_max": map_E.feature_dimensions[1].bins,
-            f"{map_E.feature_dimensions[0].name}_min": map_E.feature_dimensions[0].min,
-            f"{map_E.feature_dimensions[0].name}_max": map_E.feature_dimensions[0].bins,
-            "Performances": map_E.performances.tolist()
-        }
-        filename = f"{log_dir_name}/results_{map_E.feature_dimensions[1].name}_{map_E.feature_dimensions[0].name}.json"
-        with open(filename, 'w') as f:
-            f.write(json.dumps(repo))
 
         Individual.COUNT = 0
 
